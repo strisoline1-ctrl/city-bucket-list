@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>City Bucket List — Dispatch Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080e1a;
+      --surface:   #111827;
+      --surface2:  #1a2336;
+      --border:    #1e2d44;
+      --border2:   #253245;
+      --teal:      #22d3ee;
+      --teal-dim:  #0891b2;
+      --green:     #10b981;
+      --amber:     #f59e0b;
+      --red:       #f87171;
+      --purple:    #c084fc;
+      --blue:      #60a5fa;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --dim:       #475569;
+      --r:         10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Topbar ─────────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 24px;
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -.02em;
+      color: var(--teal);
+      white-space: nowrap;
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, var(--teal-dim), var(--teal));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .topbar-sub {
+      font-size: 12px;
+      color: var(--muted);
+      padding-left: 14px;
+      border-left: 1px solid var(--border2);
+    }
+
+    .topbar-spacer { flex: 1; }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: var(--green);
+      background: rgba(16,185,129,.1);
+      border: 1px solid rgba(16,185,129,.25);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .live-dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.4; transform:scale(.75); }
+    }
+
+    .clock {
+      font-size: 13px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      min-width: 82px;
+      text-align: right;
+    }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .dash {
+      padding: 20px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 1380px;
+      margin: 0 auto;
+    }
+
+    /* ── Stat cards ─────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 20px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--dim);
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 10px;
+    }
+
+    .kpi-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .trend { font-weight: 700; }
+    .up   { color: var(--green); }
+    .dn   { color: var(--red); }
+
+    .spark {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 88px; height: 44px;
+      opacity: .35;
+    }
+
+    /* ── Panels ─────────────────────────────────────────── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+    }
+
+    .ptitle {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pbadge {
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--surface2);
+      color: var(--dim);
+      padding: 2px 9px;
+      border-radius: 12px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    /* ── Middle row ─────────────────────────────────────── */
+    .mid-row {
+      display: grid;
+      grid-template-columns: 1fr 310px;
+      gap: 14px;
+    }
+
+    /* ── Outcomes panel ─────────────────────────────────── */
+    .outcomes-body {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .donut-wrap {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      flex-shrink: 0;
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-num  { font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: -.04em; }
+    .donut-sub  { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+    .legend { display: flex; flex-direction: column; gap: 13px; flex: 1; }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ldot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .lname { flex: 1; font-size: 13px; }
+    .lcount { font-size: 15px; font-weight: 800; }
+    .lpct { font-size: 12px; color: var(--dim); width: 40px; text-align: right; }
+
+    .outcomes-stats {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+    }
+
+    .ostat {
+      flex: 1;
+      padding: 0 16px;
+      border-right: 1px solid var(--border);
+    }
+    .ostat:first-child { padding-left: 0; }
+    .ostat:last-child  { border-right: none; }
+
+    .ostat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--dim);
+      margin-bottom: 4px;
+    }
+
+    .ostat-val { font-size: 20px; font-weight: 800; letter-spacing: -.03em; }
+
+    /* ── Drivers panel ──────────────────────────────────── */
+    .driver-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .driver-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+    }
+
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .dinfo { flex: 1; min-width: 0; }
+    .dname { font-size: 13px; font-weight: 700; }
+    .dzone { font-size: 11px; color: var(--dim); }
+
+    .chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .chip-avail    { color: var(--green);  background: rgba(16,185,129,.12);  border: 1px solid rgba(16,185,129,.25); }
+    .chip-trip     { color: var(--amber);  background: rgba(245,158,11,.12);  border: 1px solid rgba(245,158,11,.25); }
+    .chip-pending  { color: var(--blue);   background: rgba(96,165,250,.12);  border: 1px solid rgba(96,165,250,.25); }
+    .chip-confirmed{ color: var(--purple); background: rgba(192,132,252,.12); border: 1px solid rgba(192,132,252,.25); }
+    .chip-complete { color: var(--green);  background: rgba(16,185,129,.12);  border: 1px solid rgba(16,185,129,.25); }
+    .chip-escalate { color: var(--red);    background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); }
+
+    /* ── Bookings table ─────────────────────────────────── */
+    .tbl-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--dim);
+      text-align: left;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--surface2); }
+
+    .td-name { font-weight: 700; }
+    .td-route { color: var(--muted); }
+    .td-sched { font-size: 12px; }
+    .td-time  { font-size: 12px; color: var(--dim); }
+    .td-type  { font-size: 11px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: .04em; }
+
+    /* ── Bottom row ─────────────────────────────────────── */
+    .bot-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* ── Funnel ─────────────────────────────────────────── */
+    .funnel { display: flex; flex-direction: column; gap: 11px; }
+
+    .f-row { display: flex; align-items: center; gap: 10px; }
+
+    .f-label {
+      width: 130px;
+      flex-shrink: 0;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    }
+
+    .f-track {
+      flex: 1;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .f-bar {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--teal-dim), var(--teal));
+    }
+
+    .f-count {
+      width: 28px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* ── Activity feed ──────────────────────────────────── */
+    .feed { display: flex; flex-direction: column; max-height: 310px; overflow-y: auto; }
+
+    .feed-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 2px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feed-item:last-child { border-bottom: none; }
+
+    .ficon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .fi-call    { background: rgba(96,165,250,.15); }
+    .fi-dispatch{ background: rgba(34,211,238,.15); }
+    .fi-book    { background: rgba(192,132,252,.15); }
+    .fi-sms     { background: rgba(16,185,129,.15); }
+    .fi-end     { background: rgba(71,85,105,.2); }
+    .fi-faq     { background: rgba(245,158,11,.15); }
+    .fi-warn    { background: rgba(248,113,113,.15); }
+
+    .fbody    { flex: 1; min-width: 0; }
+    .ftitle   { font-size: 13px; font-weight: 600; }
+    .fdetail  { font-size: 12px; color: var(--muted); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ftime    { font-size: 11px; color: var(--dim); flex-shrink: 0; padding-top: 2px; }
+
+    /* ── Scrollbar ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════ TOPBAR ════════════════════════ -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon">🗺</div>
+    City Bucket List
+  </div>
+  <span class="topbar-sub">Dispatch Dashboard</span>
+  <div class="topbar-spacer"></div>
+  <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+  <div class="clock" id="clock">1:07:42 PM</div>
+</header>
+
+<!-- ════════════════════════ MAIN ════════════════════════ -->
+<main class="dash">
+
+  <!-- KPI row -->
+  <div class="kpi-row">
+
+    <div class="kpi">
+      <div class="kpi-label">Calls Today</div>
+      <div class="kpi-value" style="color:var(--teal)">47</div>
+      <div class="kpi-meta">
+        <span class="trend up">↑ 12%</span> vs yesterday (42)
+      </div>
+      <svg class="spark" viewBox="0 0 88 44" preserveAspectRatio="none">
+        <polyline points="0,36 11,30 22,32 33,20 44,22 55,14 66,17 77,9 88,6"
+          fill="none" stroke="var(--teal)" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">Rides Dispatched</div>
+      <div class="kpi-value" style="color:var(--green)">23</div>
+      <div class="kpi-meta">
+        <span class="trend up">↑ 5</span> immediate rides
+      </div>
+      <svg class="spark" viewBox="0 0 88 44" preserveAspectRatio="none">
+        <polyline points="0,38 11,33 22,28 33,24 44,19 55,17 66,14 77,11 88,9"
+          fill="none" stroke="var(--green)" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">Scheduled Bookings</div>
+      <div class="kpi-value" style="color:var(--purple)">18</div>
+      <div class="kpi-meta">
+        <span class="trend up">↑ 3</span> vs yesterday (15)
+      </div>
+      <svg class="spark" viewBox="0 0 88 44" preserveAspectRatio="none">
+        <polyline points="0,40 11,35 22,37 33,28 44,30 55,23 66,20 77,17 88,14"
+          fill="none" stroke="var(--purple)" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">Drivers Available</div>
+      <div class="kpi-value" style="color:var(--amber)">3
+        <span style="font-size:18px;font-weight:500;color:var(--dim)"> / 5</span>
+      </div>
+      <div class="kpi-meta">
+        <span style="color:var(--amber)">2 on trip</span>&nbsp;· 0 offline
+      </div>
+      <svg class="spark" viewBox="0 0 88 44" preserveAspectRatio="none">
+        <polyline points="0,15 11,22 22,14 33,10 44,16 55,22 66,14 77,9 88,15"
+          fill="none" stroke="var(--amber)" stroke-width="2"/>
+      </svg>
+    </div>
+
+  </div><!-- /kpi-row -->
+
+  <!-- Middle: outcomes + drivers -->
+  <div class="mid-row">
+
+    <!-- Call Outcomes -->
+    <div class="panel">
+      <div class="ptitle">
+        Call Outcomes
+        <span class="pbadge">Today · 47 calls</span>
+      </div>
+
+      <div class="outcomes-body">
+        <!-- Donut chart -->
+        <!-- r=55, C=2π×55≈345.6≈346 -->
+        <!-- Dispatched 23/47: 169  Booked 18/47: 132  Escalated 4/47: 30  Dropped 2/47: 15 -->
+        <!-- Offsets: 0 / -169 / -301 / -331 -->
+        <div class="donut-wrap">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="55" fill="none" stroke="#1a2336" stroke-width="24"/>
+            <circle cx="80" cy="80" r="55" fill="none" stroke="#22d3ee" stroke-width="24"
+              stroke-dasharray="169 346" stroke-dashoffset="0"
+              transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="55" fill="none" stroke="#c084fc" stroke-width="24"
+              stroke-dasharray="132 346" stroke-dashoffset="-169"
+              transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="55" fill="none" stroke="#f87171" stroke-width="24"
+              stroke-dasharray="30 346" stroke-dashoffset="-301"
+              transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="55" fill="none" stroke="#334155" stroke-width="24"
+              stroke-dasharray="15 346" stroke-dashoffset="-331"
+              transform="rotate(-90 80 80)"/>
+          </svg>
+          <div class="donut-center">
+            <span class="donut-num">47</span>
+            <span class="donut-sub">total calls</span>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+          <div class="legend-row">
+            <div class="ldot" style="background:var(--teal)"></div>
+            <span class="lname">Dispatched</span>
+            <span class="lcount">23</span>
+            <span class="lpct">48.9%</span>
+          </div>
+          <div class="legend-row">
+            <div class="ldot" style="background:var(--purple)"></div>
+            <span class="lname">Booked</span>
+            <span class="lcount">18</span>
+            <span class="lpct">38.3%</span>
+          </div>
+          <div class="legend-row">
+            <div class="ldot" style="background:var(--red)"></div>
+            <span class="lname">Escalated</span>
+            <span class="lcount">4</span>
+            <span class="lpct">8.5%</span>
+          </div>
+          <div class="legend-row">
+            <div class="ldot" style="background:#334155"></div>
+            <span class="lname">Dropped</span>
+            <span class="lcount">2</span>
+            <span class="lpct">4.3%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="outcomes-stats">
+        <div class="ostat">
+          <div class="ostat-label">Avg Duration</div>
+          <div class="ostat-val">2m 18s</div>
+        </div>
+        <div class="ostat">
+          <div class="ostat-label">Peak Hour</div>
+          <div class="ostat-val">12–1 PM</div>
+        </div>
+        <div class="ostat">
+          <div class="ostat-label">Escalation Rate</div>
+          <div class="ostat-val" style="color:var(--red)">8.5%</div>
+        </div>
+        <div class="ostat">
+          <div class="ostat-label">Active Now</div>
+          <div class="ostat-val" style="color:var(--green)">2</div>
+        </div>
+      </div>
+    </div><!-- /outcomes -->
+
+    <!-- Drivers -->
+    <div class="panel">
+      <div class="ptitle">
+        Driver Status
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="pbadge">3 available</span>
+          <a href="/dashboard/drivers" target="_blank"
+             style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;text-decoration:none;
+                    color:var(--teal);background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);
+                    letter-spacing:0;text-transform:none;">
+            QR Codes ↗
+          </a>
+        </div>
+      </div>
+      <div class="driver-list">
+
+        <div class="driver-row">
+          <div class="avatar" style="background:rgba(34,211,238,.15);color:var(--teal)">MT</div>
+          <div class="dinfo">
+            <div class="dname">Marcus T.</div>
+            <div class="dzone">Downtown · en route since 1:04 PM</div>
+          </div>
+          <div class="chip chip-trip">On Trip</div>
+        </div>
+
+        <div class="driver-row">
+          <div class="avatar" style="background:rgba(16,185,129,.15);color:var(--green)">KR</div>
+          <div class="dinfo">
+            <div class="dname">Keisha R.</div>
+            <div class="dzone">Westside · free since 12:41 PM</div>
+          </div>
+          <div class="chip chip-avail">Available</div>
+        </div>
+
+        <div class="driver-row">
+          <div class="avatar" style="background:rgba(16,185,129,.15);color:var(--green)">DL</div>
+          <div class="dinfo">
+            <div class="dname">Devon L.</div>
+            <div class="dzone">Eastside · free since 12:05 PM</div>
+          </div>
+          <div class="chip chip-avail">Available</div>
+        </div>
+
+        <div class="driver-row">
+          <div class="avatar" style="background:rgba(192,132,252,.15);color:var(--purple)">PA</div>
+          <div class="dinfo">
+            <div class="dname">Priya A.</div>
+            <div class="dzone">Downtown · free since 11:52 AM</div>
+          </div>
+          <div class="chip chip-avail">Available</div>
+        </div>
+
+        <div class="driver-row">
+          <div class="avatar" style="background:rgba(245,158,11,.15);color:var(--amber)">RM</div>
+          <div class="dinfo">
+            <div class="dname">Ray M.</div>
+            <div class="dzone">Midtown · en route since 1:19 PM</div>
+          </div>
+          <div class="chip chip-trip">On Trip</div>
+        </div>
+
+      </div>
+    </div><!-- /drivers -->
+
+  </div><!-- /mid-row -->
+
+  <!-- Bookings table -->
+  <div class="panel">
+    <div class="ptitle">
+      Recent Bookings
+      <span class="pbadge">Last 8</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Caller</th>
+            <th>Pickup → Dropoff</th>
+            <th>Type</th>
+            <th>Scheduled At</th>
+            <th>Driver</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-name">James Wallace</td>
+            <td class="td-route">4th &amp; Broadway → Airport Terminal B</td>
+            <td class="td-type">Immediate</td>
+            <td style="color:var(--dim)">—</td>
+            <td>Marcus T.</td>
+            <td><span class="chip chip-trip">En Route</span></td>
+            <td class="td-time">3m ago</td>
+          </tr>
+          <tr>
+            <td class="td-name">Priya Chen</td>
+            <td class="td-route">Riverside Dr → Downtown Hotel</td>
+            <td class="td-type">Scheduled</td>
+            <td class="td-sched">May 8 · 2:30 PM</td>
+            <td style="color:var(--dim)">—</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+            <td class="td-time">5m ago</td>
+          </tr>
+          <tr>
+            <td class="td-name">Amara Johnson</td>
+            <td class="td-route">12th &amp; Oak → Westside Mall</td>
+            <td class="td-type">Immediate</td>
+            <td style="color:var(--dim)">—</td>
+            <td>Ray M.</td>
+            <td><span class="chip chip-trip">En Route</span></td>
+            <td class="td-time">22m ago</td>
+          </tr>
+          <tr>
+            <td class="td-name">Tom Bell</td>
+            <td class="td-route">University Ave → 5th &amp; Main</td>
+            <td class="td-type">Scheduled</td>
+            <td class="td-sched">May 8 · 9:00 AM</td>
+            <td style="color:var(--dim)">—</td>
+            <td><span class="chip chip-confirmed">Confirmed</span></td>
+            <td class="td-time">38m ago</td>
+          </tr>
+          <tr>
+            <td class="td-name">Maya Santos</td>
+            <td class="td-route">Eastside Park → Medical Center</td>
+            <td class="td-type">Immediate</td>
+            <td style="color:var(--dim)">—</td>
+            <td>Devon L.</td>
+            <td><span class="chip chip-complete">Completed</span></td>
+            <td class="td-time">54m ago</td>
+          </tr>
+          <tr>
+            <td class="td-name">Chris Park</td>
+            <td class="td-route">Airport → Midtown Hotel</td>
+            <td class="td-type">Immediate</td>
+            <td style="color:var(--dim)">—</td>
+            <td>Keisha R.</td>
+            <td><span class="chip chip-complete">Completed</span></td>
+            <td class="td-time">1h ago</td>
+          </tr>
+          <tr>
+            <td class="td-name">Li Wei</td>
+            <td class="td-route">North Station → Downtown</td>
+            <td class="td-type">Scheduled</td>
+            <td class="td-sched">May 9 · 10:00 AM</td>
+            <td style="color:var(--dim)">—</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+            <td class="td-time">1h 20m ago</td>
+          </tr>
+          <tr>
+            <td class="td-name">Sandra K.</td>
+            <td class="td-route">Southgate → Convention Ctr</td>
+            <td class="td-type">Immediate</td>
+            <td style="color:var(--dim)">—</td>
+            <td style="color:var(--dim)">—</td>
+            <td><span class="chip chip-escalate">Escalated</span></td>
+            <td class="td-time">2h ago</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /bookings -->
+
+  <!-- Bottom row: funnel + feed -->
+  <div class="bot-row">
+
+    <!-- Call state funnel -->
+    <div class="panel">
+      <div class="ptitle">
+        Call State Funnel
+        <span class="pbadge">Today · 47 calls</span>
+      </div>
+      <div class="funnel">
+        <div class="f-row">
+          <span class="f-label">GREETING</span>
+          <div class="f-track"><div class="f-bar" style="width:100%"></div></div>
+          <span class="f-count">47</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">COLLECT_NAME</span>
+          <div class="f-track"><div class="f-bar" style="width:97.9%"></div></div>
+          <span class="f-count">46</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">COLLECT_INTENT</span>
+          <div class="f-track"><div class="f-bar" style="width:93.6%"></div></div>
+          <span class="f-count">44</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">COLLECT_PICKUP</span>
+          <div class="f-track"><div class="f-bar" style="width:91.5%"></div></div>
+          <span class="f-count">43</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">COLLECT_DROPOFF</span>
+          <div class="f-track"><div class="f-bar" style="width:89.4%"></div></div>
+          <span class="f-count">42</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">CONFIRM</span>
+          <div class="f-track"><div class="f-bar" style="width:87.2%"></div></div>
+          <span class="f-count">41</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">DISPATCH / BOOK</span>
+          <div class="f-track"><div class="f-bar" style="width:87.2%"></div></div>
+          <span class="f-count">41</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">GOODBYE</span>
+          <div class="f-track">
+            <div class="f-bar" style="width:78.7%;background:var(--green)"></div>
+          </div>
+          <span class="f-count" style="color:var(--green)">37</span>
+        </div>
+        <div class="f-row">
+          <span class="f-label">ESCALATE</span>
+          <div class="f-track">
+            <div class="f-bar" style="width:8.5%;background:var(--red)"></div>
+          </div>
+          <span class="f-count" style="color:var(--red)">4</span>
+        </div>
+      </div>
+    </div><!-- /funnel -->
+
+    <!-- Activity feed -->
+    <div class="panel">
+      <div class="ptitle">
+        Activity Feed
+        <span class="pbadge">Live</span>
+      </div>
+      <div class="feed">
+
+        <div class="feed-item">
+          <div class="ficon fi-call">📞</div>
+          <div class="fbody">
+            <div class="ftitle">Call Connected</div>
+            <div class="fdetail">+1 (555) 234-7890</div>
+          </div>
+          <span class="ftime">2m ago</span>
+        </div>
+
+        <div class="feed-item">
+          <div class="ficon fi-dispatch">🚗</div>
+          <div class="fbody">
+            <div class="ftitle">Driver Dispatched</div>
+            <div class="fdetail">Marcus T. → 4th &amp; Broadway · James Wallace</div>
+          </div>
+          <span class="ftime">3m ago</span>
+        </div>
+
+        <div class="feed-item">
+          <div class="ficon fi-book">📅</div>
+          <div class="fbody">
+            <div class="ftitle">Booking Created</div>
+            <div class="fdetail">Priya Chen · May 8 at 2:30 PM</div>
+          </div>
+          <span class="ftime">5m ago</span>
+        </div>
+
+        <div class="feed-item">
+          <div class="ficon fi-sms">💬</div>
+          <div class="fbody">
+            <div class="ftitle">SMS Sent to Owner</div>
+            <div class="fdetail">New booking: Priya Chen, May 8 2:30 PM</div>
+          </div>
+          <span class="ftime">5m ago</span>
+        </div>
+
+        <div class="feed-item">
+          <div class="ficon fi-end">✅</div>
+          <div class="fbody">
+            <div class="ftitle">Call Ended</div>
+            <div class="fdetail">Outcome: DISPATCH · Duration 2m 14s</div>
+          </div>
+          <span class="ftime">8m ago</span>
+        </div>
+
+        <div class="feed-item">
+          <div class="ficon fi-dispatch">🚗</div>
+          <div class="fbody">
+            <div class="ftitle">Driver Dispatched</div>
+            <div class="fdetail">Ray M. → 12th &amp; Oak · Amara Johnson</div>
+          </div>
+          <span class="ftime">22m ago</span>
+        </div>
+
+        <div class="feed-item">
+          <div class="ficon fi-faq">❓</div>
+          <div class="fbody">
+            <div class="ftitle">FAQ Answered</div>
+            <div class="fdetail">"What are your operating hours?"</div>
+          </div>
+          <span class="ftime">31m ago</span>
+        </div>
+
+        <div class="feed-item">
+          <div class="ficon fi-warn">⚠️</div>
+          <div class="fbody">
+            <div class="ftitle">Escalated to Owner</div>
+            <div class="fdetail">Max reprompts at COLLECT_PICKUP · Sandra K.</div>
+          </div>
+          <span class="ftime">2h ago</span>
+        </div>
+
+      </div>
+    </div><!-- /feed -->
+
+  </div><!-- /bot-row -->
+
+</main>
+
+<script>
+  function tick() {
+    const d = new Date();
+    const h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('clock').textContent = `${h12}:${pad(m)}:${pad(s)} ${ampm}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+
+</body>
+</html>

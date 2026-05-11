@@ -1,0 +1,31 @@
+{
+  "name": "city-bucket-list",
+  "version": "1.0.0",
+  "description": "Automated phone call receptionist for City Bucket List ride service",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "cross-env NODE_ENV=test node --test tests/**/*.test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.44.4",
+    "chrono-node": "^2.7.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "googleapis": "^140.0.1",
+    "pino": "^9.3.2",
+    "pino-http": "^10.2.0",
+    "qrcode": "^1.5.4",
+    "twilio": "^5.2.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "pino-pretty": "^11.2.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
