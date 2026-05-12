@@ -211,7 +211,7 @@
     position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
     background: rgba(20,17,14,.92); backdrop-filter: blur(14px);
     border-top: 1px solid var(--line);
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     padding: 8px 4px calc(env(safe-area-inset-bottom) + 8px);
     z-index: 10;
   }
@@ -266,6 +266,64 @@
 
   /* Hidden helper */
   .hidden { display: none !important; }
+
+  /* Driver ride list */
+  .search-wrap { position: relative; margin-bottom: 10px; }
+  .search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); pointer-events: none; }
+  .search-wrap input { padding-left: 40px; font-size: 15px; }
+
+  .filter-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+    margin: 0 -16px; padding-left: 16px; padding-right: 16px;
+    scrollbar-width: none; margin-bottom: 12px; }
+  .filter-chips::-webkit-scrollbar { display: none; }
+  .fchip { flex: none; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600;
+    color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .fchip.active { background: var(--brand); border-color: var(--brand); color: #1A1207; }
+
+  .rlist-section-head { color: var(--muted); font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; padding: 10px 4px 6px; }
+
+  .rride { display: flex; align-items: flex-start; gap: 12px; padding: 13px 14px;
+    border-bottom: 1px solid var(--line); cursor: pointer; transition: background .15s; }
+  .rride:last-child { border-bottom: 0; }
+  .rride:active { background: var(--surface-2); }
+
+  .rride .av { width: 40px; height: 40px; border-radius: 50%; background: var(--surface-2);
+    display: grid; place-items: center; font-weight: 700; font-size: 14px;
+    color: var(--brand-soft); flex: none; }
+  .rride .av.active-av { background: rgba(255,179,0,.18); color: var(--brand); }
+
+  .rride .body { flex: 1; min-width: 0; }
+  .rride .name-row { display: flex; align-items: baseline; gap: 8px; }
+  .rride .rname { font-weight: 700; font-size: 14px; }
+  .rride .rtime { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+  .rride .route { color: var(--muted); font-size: 12px; margin-top: 3px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rride .rphone { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  .sbadge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 999px; text-transform: uppercase; letter-spacing: .5px; margin-top: 5px; }
+  .sbadge.active  { background: rgba(255,179,0,.2); color: var(--brand-soft); }
+  .sbadge.next    { background: rgba(77,191,124,.15); color: #6FD49A; }
+  .sbadge.done    { background: var(--surface-2); color: var(--muted); }
+  .sbadge.sched   { background: rgba(120,90,220,.15); color: #B4A0FF; }
+
+  /* Active ride action bar */
+  .action-bar { display: flex; gap: 8px; margin: 0 0 12px; }
+  .action-bar .abtn { flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 4px; padding: 11px 6px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+    background: var(--surface); color: var(--text); font-size: 11px; font-weight: 600;
+    cursor: pointer; }
+  .action-bar .abtn svg { width: 20px; height: 20px; }
+  .action-bar .abtn.primary { background: var(--brand); border-color: var(--brand); color: #1A1207; }
+  .action-bar .abtn:active { transform: translateY(1px); }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+  .empty-state svg { width: 40px; height: 40px; opacity: .35; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; margin: 0; }
 
   /* Subtle hint banner */
   .demo-banner {
@@ -476,6 +534,54 @@
     </div>
   </div>
 
+  <!-- =================== DRIVE =================== -->
+  <main class="screen hidden" id="screen-drive">
+    <h1 class="screen-title">My <em>rides</em></h1>
+
+    <!-- Active ride action bar — shown only when there's an in-progress ride -->
+    <div class="liveops" style="margin-bottom:14px;" id="driveActiveCard">
+      <div class="eyebrow"><span class="pulse-dot"></span>In progress · en route to dropoff</div>
+      <div class="summary" style="font-size:18px;"><span class="big">Jamal Robinson</span></div>
+      <div style="color:var(--muted); font-size:13px; margin-bottom:12px;">555 Main St → LAX Terminal 4 · ~8 min</div>
+      <div class="action-bar">
+        <button class="abtn primary" onclick="toast('Navigation opened')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Navigate
+        </button>
+        <button class="abtn" onclick="toast('Calling Jamal…')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          Call
+        </button>
+        <button class="abtn" onclick="completeRide()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          Complete
+        </button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="search" id="driveSearch" placeholder="Search riders or addresses…" oninput="filterRides()" />
+    </div>
+
+    <!-- Filter chips -->
+    <div class="filter-chips">
+      <button class="fchip active" data-filter="all"      onclick="setFilter(this,'all')">All rides</button>
+      <button class="fchip"        data-filter="today"    onclick="setFilter(this,'today')">Today</button>
+      <button class="fchip"        data-filter="upcoming" onclick="setFilter(this,'upcoming')">Upcoming</button>
+      <button class="fchip"        data-filter="done"     onclick="setFilter(this,'done')">Completed</button>
+    </div>
+
+    <!-- Ride list -->
+    <div class="card flush" id="driveRideList"></div>
+
+    <div class="empty-state hidden" id="driveEmpty">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg>
+      <p>No rides match that search.</p>
+    </div>
+  </main>
+
   <!-- Tabbar -->
   <nav class="tabbar">
     <button class="tab active" data-screen="today" onclick="go('today')">
@@ -489,6 +595,10 @@
     <button class="tab" data-screen="riders" onclick="go('riders')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11h2v2H3v-2zm0-4h2v2H3V7zm0 8h2v2H3v-2zm4-8h2v2H7V7zm0 4h2v2H7v-2zm0 4h2v2H7v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
       Riders
+    </button>
+    <button class="tab" data-screen="drive" onclick="go('drive')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+      Drive
     </button>
   </nav>
 
@@ -551,7 +661,7 @@
 
 <script>
   // ---------- Navigation ----------
-  const screens = ['today', 'drivers', 'riders'];
+  const screens = ['today', 'drivers', 'riders', 'drive'];
   function go(name) {
     screens.forEach(s => {
       const el = document.getElementById('screen-' + s);
@@ -563,6 +673,7 @@
     if (name === 'today') renderDriverChips();
     if (name === 'drivers') renderDrivers();
     if (name === 'riders') renderRider();
+    if (name === 'drive') renderDriveScreen();
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
@@ -703,6 +814,145 @@
     closeAddRider();
     renderRiderList();
     toast('Rider contact saved ✓');
+  }
+
+  // ---------- Drive screen ----------
+  const myRides = [
+    // today — active / in-progress
+    { id:1,  rider:'Jamal Robinson', phone:'(555) 014-2207', pickup:'555 Main St',           dropoff:'LAX Terminal 4',           time:'7:42 PM', date:'today',    status:'active'   },
+    { id:2,  rider:'Lena Park',      phone:'(555) 220-4413', pickup:'812 Cedar Ave',          dropoff:'500 Wilshire Blvd',        time:'7:54 PM', date:'today',    status:'next'     },
+    { id:3,  rider:'Devin Soto',     phone:'(555) 884-1907', pickup:'4410 Sunset Pl',         dropoff:'Northside Mall',           time:'9:00 PM', date:'today',    status:'sched'    },
+    { id:4,  rider:'Asha Khan',      phone:'(555) 612-7728', pickup:'27 Harbor Way',          dropoff:'County General Hospital',  time:'10:15 PM',date:'today',    status:'sched'    },
+    // today — completed
+    { id:5,  rider:'Marcus Lee',     phone:'(555) 482-9010', pickup:'Downtown Hub',           dropoff:'Westfield Center',         time:'4:30 PM', date:'today',    status:'done'     },
+    { id:6,  rider:'Priya Nair',     phone:'(555) 730-0041', pickup:'Harbor Hotel',           dropoff:'Convention Ctr',           time:'3:00 PM', date:'today',    status:'done'     },
+    { id:7,  rider:'Tom Briggs',     phone:'(555) 555-1234', pickup:'123 Oak St',             dropoff:'LAX Terminal 1',           time:'1:15 PM', date:'today',    status:'done'     },
+    // upcoming — tomorrow
+    { id:8,  rider:'Sandra Wu',      phone:'(555) 310-6620', pickup:'44 Elm Dr',              dropoff:'Union Station',            time:'8:00 AM', date:'tomorrow', status:'sched'    },
+    { id:9,  rider:'Carlos Vega',    phone:'(555) 812-7744', pickup:'East Bay Apartments',    dropoff:'LAX Terminal 6',           time:'9:30 AM', date:'tomorrow', status:'sched'    },
+    { id:10, rider:'Amara Diop',     phone:'(555) 209-3391', pickup:'Riverside Inn',          dropoff:'Downtown',                 time:'11:00 AM',date:'tomorrow', status:'sched'    },
+    { id:11, rider:'Kevin Park',     phone:'(555) 461-0088', pickup:'500 Grand Ave',          dropoff:'Airport',                  time:'12:45 PM',date:'tomorrow', status:'sched'    },
+    { id:12, rider:'Fatima Osei',    phone:'(555) 703-1145', pickup:'3200 W Olympic Blvd',    dropoff:'Beverly Hills',            time:'2:00 PM', date:'tomorrow', status:'sched'    },
+    { id:13, rider:'Ryan Choi',      phone:'(555) 987-4422', pickup:'Koreatown Station',      dropoff:'LAX Terminal 4',           time:'4:15 PM', date:'tomorrow', status:'sched'    },
+    { id:14, rider:'Yuki Tanaka',    phone:'(555) 601-7890', pickup:'Sawtelle Blvd',          dropoff:'Santa Monica Pier',        time:'5:30 PM', date:'tomorrow', status:'sched'    },
+    // upcoming — later this week
+    { id:15, rider:'Asha Khan',      phone:'(555) 612-7728', pickup:'County General',         dropoff:'27 Harbor Way',            time:'8:00 AM', date:'Wed',      status:'sched'    },
+    { id:16, rider:'Lena Park',      phone:'(555) 220-4413', pickup:'500 Wilshire Blvd',      dropoff:'LAX',                      time:'6:00 AM', date:'Thu',      status:'sched'    },
+    { id:17, rider:'Jamal Robinson', phone:'(555) 014-2207', pickup:'555 Main St',            dropoff:'Staples Center',           time:'7:00 PM', date:'Thu',      status:'sched'    },
+    { id:18, rider:'Sandra Wu',      phone:'(555) 310-6620', pickup:'Union Station',          dropoff:'44 Elm Dr',                time:'3:30 PM', date:'Fri',      status:'sched'    },
+    { id:19, rider:'Marcus Lee',     phone:'(555) 482-9010', pickup:'Westfield Center',       dropoff:'Culver City',              time:'1:00 PM', date:'Sat',      status:'sched'    },
+    { id:20, rider:'Priya Nair',     phone:'(555) 730-0041', pickup:'Marina Del Rey',         dropoff:'LAX Terminal 2',           time:'5:45 AM', date:'Sun',      status:'sched'    },
+    // history
+    { id:21, rider:'Carlos Vega',    phone:'(555) 812-7744', pickup:'East Bay Apartments',    dropoff:'Downtown',                 time:'Yesterday', date:'history',status:'done'   },
+    { id:22, rider:'Amara Diop',     phone:'(555) 209-3391', pickup:'Riverside Inn',          dropoff:'LAX Terminal 3',           time:'Yesterday', date:'history',status:'done'   },
+    { id:23, rider:'Kevin Park',     phone:'(555) 461-0088', pickup:'500 Grand Ave',          dropoff:'Pasadena',                 time:'2 days ago','date':'history',status:'done' },
+    { id:24, rider:'Fatima Osei',    phone:'(555) 703-1145', pickup:'3200 W Olympic',         dropoff:'Culver City',              time:'2 days ago','date':'history',status:'done' },
+    { id:25, rider:'Tom Briggs',     phone:'(555) 555-1234', pickup:'123 Oak St',             dropoff:'Venice Beach',             time:'3 days ago','date':'history',status:'done' },
+    { id:26, rider:'Yuki Tanaka',    phone:'(555) 601-7890', pickup:'Santa Monica',           dropoff:'LAX Terminal 6',           time:'4 days ago','date':'history',status:'done' },
+    { id:27, rider:'Ryan Choi',      phone:'(555) 987-4422', pickup:'Koreatown',              dropoff:'Downtown',                 time:'5 days ago','date':'history',status:'done' },
+    { id:28, rider:'Asha Khan',      phone:'(555) 612-7728', pickup:'County General',         dropoff:'27 Harbor Way',            time:'6 days ago','date':'history',status:'done' },
+  ];
+
+  let driveFilter = 'all';
+  let drideCompleted = false;
+
+  function setFilter(el, f) {
+    document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    driveFilter = f;
+    filterRides();
+  }
+
+  function filterRides() {
+    const q = (document.getElementById('driveSearch').value || '').toLowerCase();
+    const f = driveFilter;
+
+    const visible = myRides.filter(r => {
+      const matchText = !q ||
+        r.rider.toLowerCase().includes(q) ||
+        r.pickup.toLowerCase().includes(q) ||
+        r.dropoff.toLowerCase().includes(q) ||
+        r.phone.includes(q);
+
+      const matchFilter =
+        f === 'all'                                        ? true :
+        f === 'today'    && r.date === 'today'             ? true :
+        f === 'upcoming' && (r.date === 'tomorrow' || !['today','history'].includes(r.date)) ? true :
+        f === 'done'     && (r.date === 'history' || (r.date === 'today' && r.status === 'done')) ? true :
+        false;
+
+      return matchText && matchFilter;
+    });
+
+    renderRideList(visible);
+  }
+
+  function renderRideList(list) {
+    const container = document.getElementById('driveRideList');
+    const empty = document.getElementById('driveEmpty');
+
+    if (!list.length) {
+      container.innerHTML = '';
+      container.classList.add('hidden');
+      empty.classList.remove('hidden');
+      return;
+    }
+    container.classList.remove('hidden');
+    empty.classList.add('hidden');
+
+    // Group by date bucket
+    const groups = {};
+    const order  = [];
+    list.forEach(r => {
+      const key = r.date === 'today'   ? 'Today' :
+                  r.date === 'tomorrow'? 'Tomorrow' :
+                  r.date === 'history' ? 'Earlier this week' : r.date;
+      if (!groups[key]) { groups[key] = []; order.push(key); }
+      groups[key].push(r);
+    });
+    // Dedupe order
+    const seen = new Set();
+    const uniqueOrder = order.filter(k => !seen.has(k) && seen.add(k));
+
+    container.innerHTML = uniqueOrder.map(key => {
+      const rows = groups[key].map(r => {
+        const av = r.status === 'active' ? 'active-av' : '';
+        const badge =
+          r.status === 'active' ? '<span class="sbadge active">In progress</span>' :
+          r.status === 'next'   ? '<span class="sbadge next">Next up</span>'       :
+          r.status === 'sched'  ? '<span class="sbadge sched">Scheduled</span>'    :
+                                  '<span class="sbadge done">Completed</span>';
+        return `
+          <div class="rride" onclick="toast('${r.rider} · ${r.pickup} → ${r.dropoff}')">
+            <div class="av ${av}">${initials(r.rider)}</div>
+            <div class="body">
+              <div class="name-row">
+                <span class="rname">${r.rider}</span>
+                <span class="rtime">${r.time}</span>
+              </div>
+              <div class="route">${r.pickup} → ${r.dropoff}</div>
+              <div class="rphone">${r.phone}</div>
+              ${badge}
+            </div>
+          </div>`;
+      }).join('');
+      return `<div class="rlist-section-head" style="padding:10px 14px 4px;">${key}</div>${rows}`;
+    }).join('');
+  }
+
+  function renderDriveScreen() {
+    document.getElementById('driveActiveCard').classList.toggle('hidden', drideCompleted);
+    filterRides();
+  }
+
+  function completeRide() {
+    drideCompleted = true;
+    document.getElementById('driveActiveCard').classList.add('hidden');
+    // Mark the active ride as done in the list
+    const r = myRides.find(x => x.status === 'active');
+    if (r) r.status = 'done';
+    filterRides();
+    toast('Ride completed · great job!');
   }
 
   // ---------- Boot ----------
