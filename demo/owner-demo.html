@@ -87,31 +87,77 @@
     border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
   .card.flush { padding: 0; overflow: hidden; }
 
-  /* Hero card */
-  .hero {
+  /* Live ops panel — replaces the marketing hero */
+  .liveops {
     position: relative; overflow: hidden;
     background:
-      radial-gradient(circle at 85% -10%, rgba(255,179,0,.22), transparent 55%),
-      radial-gradient(circle at 10% 110%, rgba(176,122,0,.18), transparent 55%),
+      radial-gradient(circle at 88% -10%, rgba(255,179,0,.18), transparent 55%),
+      radial-gradient(circle at 8% 110%, rgba(176,122,0,.14), transparent 55%),
       var(--surface);
     border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 22px 20px 20px; margin-bottom: 14px;
+    padding: 16px 16px 6px; margin-bottom: 12px;
   }
-  .hero .eyebrow { color: var(--brand-soft); font-size: 11px; font-weight: 700;
-    letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 8px; }
-  .hero .headline { font-family: var(--font-display); font-weight: 700;
-    font-size: 36px; line-height: 1.05; letter-spacing: -.025em; }
-  .hero .headline .big { color: var(--brand); }
-  .hero .headline em { font-style: italic; font-weight: 500; color: var(--text); opacity: .85; }
-  .hero .sub { color: var(--muted); font-size: 13px; margin-top: 10px; line-height: 1.45; }
-  .hero .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--good); margin-right: 6px; vertical-align: 1px;
-    box-shadow: 0 0 0 0 rgba(77,191,124,.7); animation: pulseDot 2s infinite; }
+  .liveops .eyebrow { color: var(--brand-soft); font-size: 11px; font-weight: 700;
+    letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px; }
+  .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--good); box-shadow: 0 0 0 0 rgba(77,191,124,.7); animation: pulseDot 2s infinite; }
   @keyframes pulseDot {
     0% { box-shadow: 0 0 0 0 rgba(77,191,124,.6); }
     70% { box-shadow: 0 0 0 10px rgba(77,191,124,0); }
     100% { box-shadow: 0 0 0 0 rgba(77,191,124,0); }
   }
+  .liveops .summary { font-family: var(--font-display); font-weight: 700;
+    font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin-bottom: 12px; }
+  .liveops .summary .big { color: var(--brand); }
+  .liveops .summary em { font-style: italic; font-weight: 500; color: var(--text); opacity: .8; }
+
+  /* Active ride card */
+  .ride { display: grid; grid-template-columns: auto 1fr auto; gap: 12px;
+    padding: 12px 0; border-top: 1px solid var(--line); align-items: center; }
+  .ride:first-of-type { border-top: 0; }
+  .ride .icon { width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(255,179,0,.12); color: var(--brand); display: grid; place-items: center;
+    font-weight: 800; font-family: var(--font-display); font-size: 14px; flex: none; }
+  .ride .icon.scheduled { background: rgba(255,179,0,.06); color: var(--muted); }
+  .ride .info .t { font-weight: 600; font-size: 14px; }
+  .ride .info .s { color: var(--muted); font-size: 12px; margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+  .ride .eta { text-align: right; font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .ride .eta .big { display: block; font-family: var(--font-display); font-weight: 700;
+    font-size: 14px; color: var(--text); letter-spacing: -.01em; }
+
+  /* Quick actions */
+  .quick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .quick .qbtn { background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-sm); padding: 14px 12px; text-align: left;
+    color: var(--text); font: inherit; cursor: pointer; }
+  .quick .qbtn:active { transform: translateY(1px); }
+  .quick .qbtn .lbl { font-weight: 700; font-size: 14px; }
+  .quick .qbtn .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .quick .qbtn.primary { background: var(--brand); border-color: var(--brand); color: #1A1207; }
+  .quick .qbtn.primary .sub { color: rgba(26,18,7,.65); }
+
+  /* Mini driver chip strip */
+  .driver-chips { display: flex; gap: 8px; overflow-x: auto;
+    padding-bottom: 4px; margin: 0 -16px 0 -16px; padding-left: 16px; padding-right: 16px;
+    scrollbar-width: none; }
+  .driver-chips::-webkit-scrollbar { display: none; }
+  .dchip { flex: none; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 10px 12px; min-width: 132px; }
+  .dchip .top { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; }
+  .dchip .stat { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  /* Grow panel */
+  .grow { background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 14px 16px; }
+  .grow .row-tight { display: flex; justify-content: space-between; align-items: baseline;
+    padding: 6px 0; }
+  .grow .row-tight + .row-tight { border-top: 1px solid var(--line); }
+  .grow .row-tight .l { font-size: 13px; color: var(--text); }
+  .grow .row-tight .l .muted { color: var(--muted); margin-left: 6px; font-size: 12px; }
+  .grow .row-tight .r { font-family: var(--font-display); font-weight: 700;
+    font-size: 16px; color: var(--brand); letter-spacing: -.01em; }
 
   /* Stat strip — secondary KPIs under the hero */
   .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
@@ -256,28 +302,99 @@
 
   <!-- =================== TODAY =================== -->
   <main class="screen" id="screen-today">
-    <h1 class="screen-title">Good evening, <em>Marcus</em></h1>
+    <h1 class="screen-title">Good evening, <em>Brian</em></h1>
 
-    <div class="hero">
-      <div class="eyebrow"><span class="pulse-dot"></span>Live · Monday, May 11</div>
-      <div class="headline"><span class="big">3 drivers</span> on shift.<br><em>8 riders out.</em></div>
-      <div class="sub">Your fleet at a glance — who's driving, who's riding, and which pickups are happening right now. Tap any name for the full profile.</div>
+    <!-- LIVE OPS -->
+    <div class="liveops">
+      <div class="eyebrow"><span class="pulse-dot"></span>Live now · Monday, 7:42 PM</div>
+      <div class="summary"><span class="big">2 rides in progress.</span><br><em>Next pickup in 12 min.</em></div>
+
+      <div class="ride">
+        <div class="icon">JR</div>
+        <div class="info">
+          <div class="t">Jamal R. → LAX T4</div>
+          <div class="s">Driver Marcus · en route to dropoff</div>
+        </div>
+        <div class="eta"><span class="big">8 min</span>to dropoff</div>
+      </div>
+
+      <div class="ride">
+        <div class="icon">DS</div>
+        <div class="info">
+          <div class="t">Devin S. → Northside</div>
+          <div class="s">Driver Priya · arriving at pickup</div>
+        </div>
+        <div class="eta"><span class="big">1 min</span>to pickup</div>
+      </div>
+
+      <div class="ride">
+        <div class="icon scheduled">LP</div>
+        <div class="info">
+          <div class="t">Lena P. → LAX</div>
+          <div class="s">Home · awaiting dispatch</div>
+        </div>
+        <div class="eta"><span class="big">7:54</span>pickup</div>
+      </div>
     </div>
 
+    <!-- QUICK ACTIONS -->
+    <div class="quick">
+      <button class="qbtn primary" onclick="go('riders')">
+        <div class="lbl">+ Dispatch ride</div>
+        <div class="sub">Pick a rider, send a driver</div>
+      </button>
+      <button class="qbtn" onclick="toast('Broadcast queued · 3 drivers')">
+        <div class="lbl">Message drivers</div>
+        <div class="sub">Text all on shift</div>
+      </button>
+    </div>
+
+    <!-- FLEET SNAPSHOT -->
+    <div class="section-label">Drivers on shift</div>
+    <div class="driver-chips" id="driverChips"></div>
+
+    <!-- TODAY'S NUMBERS -->
+    <div class="section-label">Today's numbers</div>
     <div class="stats">
       <div class="stat accent"><div class="num">8</div><div class="lbl">Rides today</div></div>
       <div class="stat"><div class="num">18</div><div class="lbl">Riders in contacts</div></div>
     </div>
 
+    <!-- GROW CBL -->
+    <div class="section-label">Grow CBL</div>
+    <div class="grow">
+      <div class="row-tight">
+        <div class="l">New riders this week<span class="muted">added to contacts</span></div>
+        <div class="r">+5</div>
+      </div>
+      <div class="row-tight">
+        <div class="l">Repeat rider rate<span class="muted">last 30 days</span></div>
+        <div class="r">68%</div>
+      </div>
+      <div class="row-tight">
+        <div class="l">Top regular<span class="muted">Asha K. · 12 rides</span></div>
+        <div class="r">→</div>
+      </div>
+    </div>
+
+    <div style="height:6px;"></div>
     <div class="section-label">Recent activity</div>
     <div class="card flush">
       <div class="row">
-        <div class="avatar">JR</div>
+        <div class="avatar">TA</div>
         <div class="meta">
-          <div class="t">Jamal R. · airport pickup</div>
-          <div class="s">Driver Marcus on the way · 4 min ago</div>
+          <div class="t">Tomas A. · clocked in via QR</div>
+          <div class="s">Northside zone · 2 hr ago</div>
         </div>
-        <span class="pill good">live</span>
+        <span class="pill good">on shift</span>
+      </div>
+      <div class="row">
+        <div class="avatar">DS</div>
+        <div class="meta">
+          <div class="t">Devin S. · downtown → north</div>
+          <div class="s">Completed · $14 · 1 hr ago</div>
+        </div>
+        <span class="pill">done</span>
       </div>
       <div class="row">
         <div class="avatar">LP</div>
@@ -287,35 +404,7 @@
         </div>
         <span class="pill warn">scheduled</span>
       </div>
-      <div class="row">
-        <div class="avatar">DS</div>
-        <div class="meta">
-          <div class="t">Devin S. · downtown to north</div>
-          <div class="s">Completed · $14 · 1 hr ago</div>
-        </div>
-        <span class="pill">done</span>
-      </div>
-      <div class="row">
-        <div class="avatar">TA</div>
-        <div class="meta">
-          <div class="t">Tomas A. · clocked in via QR</div>
-          <div class="s">Northside zone · 2 hr ago</div>
-        </div>
-        <span class="pill good">on shift</span>
-      </div>
     </div>
-
-    <div class="section-label">Why this matters</div>
-    <div class="card" style="padding: 18px 18px 20px;">
-      <div style="font-family:var(--font-display); font-size:20px; font-weight:700; letter-spacing:-.01em; line-height:1.25; margin-bottom:8px;">
-        Every driver onboarded fast, <em style="color:var(--brand-soft); font-weight:500;">every rider confirmed by QR.</em>
-      </div>
-      <div style="color:var(--muted); font-size:14px; line-height:1.55;">
-        Add a new driver in under a minute and text them a QR card to clock in. Every rider gets a one-time pickup QR — the driver scans it on arrival, so there's no "are you my driver?" guesswork.
-      </div>
-    </div>
-
-    <button class="btn primary" onclick="go('drivers')">See your drivers →</button>
   </main>
 
   <!-- =================== DRIVERS =================== -->
@@ -471,6 +560,7 @@
     document.querySelectorAll('.tab').forEach(t => {
       t.classList.toggle('active', t.dataset.screen === name);
     });
+    if (name === 'today') renderDriverChips();
     if (name === 'drivers') renderDrivers();
     if (name === 'riders') renderRider();
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -493,9 +583,9 @@
 
   // ---------- Drivers ----------
   const drivers = [
-    { name: 'Marcus Johnson', phone: '(555) 901-4422', vehicle: '2022 Toyota Sienna', zone: 'Downtown', online: true, rides: 142 },
-    { name: 'Priya Sharma', phone: '(555) 770-1180', vehicle: '2021 Honda Odyssey', zone: 'Airport', online: true, rides: 98 },
-    { name: 'Tomas Alvarez', phone: '(555) 312-8800', vehicle: '2023 Kia Carnival', zone: 'North', online: false, rides: 64 }
+    { name: 'Marcus Johnson', phone: '(555) 901-4422', vehicle: '2022 Toyota Sienna', zone: 'Downtown', online: true, rides: 142, today: 4, status: 'In trip · LAX' },
+    { name: 'Priya Sharma',   phone: '(555) 770-1180', vehicle: '2021 Honda Odyssey', zone: 'Airport',  online: true, rides: 98,  today: 3, status: 'En route to pickup' },
+    { name: 'Tomas Alvarez',  phone: '(555) 312-8800', vehicle: '2023 Kia Carnival',  zone: 'North',    online: true, rides: 64,  today: 1, status: 'Idle · Northside' }
   ];
 
   function renderDrivers() {
@@ -508,6 +598,19 @@
           <div class="s">${d.vehicle} · ${d.zone} · ${d.rides} rides</div>
         </div>
         <span class="pill ${d.online ? 'good' : ''}">${d.online ? 'online' : 'off'}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderDriverChips() {
+    const wrap = document.getElementById('driverChips');
+    if (!wrap) return;
+    const onShift = drivers.filter(d => d.online);
+    wrap.innerHTML = onShift.map(d => `
+      <div class="dchip" onclick="go('drivers')">
+        <div class="top"><span class="dot"></span>${d.name.split(' ')[0]}</div>
+        <div class="stat">${d.status}</div>
+        <div class="stat">${d.today} ride${d.today === 1 ? '' : 's'} today</div>
       </div>
     `).join('');
   }

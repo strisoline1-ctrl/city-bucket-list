@@ -1,7 +1,7 @@
 SMS to the owner — copy/paste, swap in your link
 =================================================
 
-Hey [owner first name] — got something to show you.
+Hey Brian — got something to show you.
 
 I built a quick preview of the new operations app for City Bucket List:
   • see your whole fleet at a glance — who's on shift, who's riding
@@ -22,7 +22,7 @@ day-to-day, and what's missing.
 SHORT VERSION (if you'd rather keep it casual)
 ----------------------------------------------
 
-Hey [owner] — quick preview of the new driver & rider app for
+Hey Brian — quick preview of the new driver & rider app for
 City Bucket List. Tap on your phone (2 min, no login):
 [PASTE LINK HERE]
 Let me know what you'd actually use.
