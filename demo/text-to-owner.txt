@@ -1,0 +1,71 @@
+SMS to the owner — copy/paste, swap in your link
+=================================================
+
+Hey [owner first name] — got something to show you.
+
+I built a quick preview of the new operations app for City Bucket List:
+  • see your whole fleet at a glance — who's on shift, who's riding
+  • onboards new drivers in about a minute with a QR card
+  • saves rider contacts with home / work addresses for repeat bookings
+  • gives each rider a one-time QR so pickups never get mixed up
+
+(The auto-receptionist that takes calls and dispatches drivers is a
+bigger upgrade — I'll bring that proposal to you separately.)
+
+Tap here on your phone — it's a 2-minute tap-through, no logins:
+[PASTE LINK HERE]
+
+When you've got 5 minutes I'd love to know which parts you'd actually use
+day-to-day, and what's missing.
+
+
+SHORT VERSION (if you'd rather keep it casual)
+----------------------------------------------
+
+Hey [owner] — quick preview of the new driver & rider app for
+City Bucket List. Tap on your phone (2 min, no login):
+[PASTE LINK HERE]
+Let me know what you'd actually use.
+
+
+HOW TO TURN THE FILE INTO A LINK YOU CAN TEXT
+=============================================
+
+You've got three easy options. Pick whichever takes you less than 5 minutes.
+
+Option A — GitHub Pages (free, permanent link, recommended)
+-----------------------------------------------------------
+The repo is already on GitHub, so this is mostly clicks.
+
+  1. Commit and push the demo folder:
+       git add demo/owner-demo.html
+       git commit -m "Add owner demo preview"
+       git push
+
+  2. On github.com, open the repo → Settings → Pages.
+  3. Source: "Deploy from a branch". Branch: main, folder: / (root). Save.
+  4. Wait ~1 minute. GitHub gives you a URL like:
+       https://<your-username>.github.io/city-bucket-list/demo/owner-demo.html
+  5. Paste that link into the SMS above and send.
+
+Option B — Drop into OneDrive and share a link (also free)
+----------------------------------------------------------
+  1. The file already lives in your OneDrive folder.
+  2. Right-click owner-demo.html in File Explorer → Share → "Copy link".
+  3. Make sure permission is "Anyone with the link can view".
+  4. Paste that link into the SMS.
+
+  Note: some phones open OneDrive files in the OneDrive app instead of a
+  browser, which can break the layout. If the owner mentions weirdness,
+  switch to Option A.
+
+Option C — Quick tunnel for a live demo (laptop must stay open)
+---------------------------------------------------------------
+Good if you want him to see it RIGHT NOW while you're together.
+
+  1. Open a terminal in the project folder and run:
+       npx http-server ./demo -p 8080
+  2. In a second terminal:
+       ngrok http 8080
+  3. ngrok prints a public URL — paste that + "/owner-demo.html" into the SMS.
+  4. Stop when done (link dies when you stop ngrok).
