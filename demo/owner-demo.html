@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#14110E" />
+<title>City Bucket List — Owner Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14110E;
+    --surface: #1E1A14;
+    --surface-2: #2A241C;
+    --line: #34291E;
+    --text: #F6EFE0;
+    --muted: #9A8E7C;
+    --brand: #FFB300;
+    --brand-soft: #FFD86B;
+    --brand-deep: #B07A00;
+    --good: #4DBF7C;
+    --bad: #E54B4B;
+    --shadow: 0 12px 36px rgba(0,0,0,.45);
+    --radius: 20px;
+    --radius-sm: 14px;
+    --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; }
+  body { min-height: 100vh; min-height: 100dvh; }
+
+  /* Phone-frame look on desktop, edge-to-edge on mobile */
+  .app {
+    max-width: 480px; margin: 0 auto; min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column; position: relative;
+    background: var(--bg);
+  }
+  @media (min-width: 600px) {
+    body { padding: 24px; }
+    .app { border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; min-height: 820px; }
+  }
+
+  /* Top bar */
+  .topbar {
+    padding: 20px 20px 10px; display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; background:
+      linear-gradient(180deg, var(--bg) 75%, rgba(20,17,14,0) 100%);
+    z-index: 5;
+  }
+  .logo {
+    width: 44px; height: 44px; border-radius: 13px;
+    background: radial-gradient(circle at 28% 22%, #FFE38A 0%, var(--brand) 45%, #B0660A 110%);
+    display: grid; place-items: center;
+    box-shadow:
+      0 8px 20px rgba(255,179,0,.28),
+      inset 0 1px 0 rgba(255,255,255,.35),
+      inset 0 -2px 6px rgba(120,60,0,.25);
+    position: relative;
+    flex: none;
+  }
+  .logo svg { display: block; }
+  .logo::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); pointer-events: none;
+  }
+  .brand-name { font-family: var(--font-display); font-weight: 700;
+    font-size: 17px; letter-spacing: -.01em; }
+  .brand-sub { font-size: 11px; color: var(--muted); margin-top: 1px;
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  /* Screen container */
+  .screen { flex: 1; padding: 8px 16px 110px; overflow-y: auto;
+    animation: fadeUp .35s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .screen-title { font-family: var(--font-display); font-size: 30px; font-weight: 700;
+    letter-spacing: -.02em; line-height: 1.1; margin: 12px 4px 18px; }
+  .screen-title em { font-style: italic; font-weight: 500; color: var(--brand-soft); }
+  .section-label { color: var(--muted); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1.2px; margin: 20px 6px 10px; font-weight: 600; }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .card.flush { padding: 0; overflow: hidden; }
+
+  /* Hero card */
+  .hero {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 85% -10%, rgba(255,179,0,.22), transparent 55%),
+      radial-gradient(circle at 10% 110%, rgba(176,122,0,.18), transparent 55%),
+      var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 20px 20px; margin-bottom: 14px;
+  }
+  .hero .eyebrow { color: var(--brand-soft); font-size: 11px; font-weight: 700;
+    letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 8px; }
+  .hero .headline { font-family: var(--font-display); font-weight: 700;
+    font-size: 36px; line-height: 1.05; letter-spacing: -.025em; }
+  .hero .headline .big { color: var(--brand); }
+  .hero .headline em { font-style: italic; font-weight: 500; color: var(--text); opacity: .85; }
+  .hero .sub { color: var(--muted); font-size: 13px; margin-top: 10px; line-height: 1.45; }
+  .hero .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--good); margin-right: 6px; vertical-align: 1px;
+    box-shadow: 0 0 0 0 rgba(77,191,124,.7); animation: pulseDot 2s infinite; }
+  @keyframes pulseDot {
+    0% { box-shadow: 0 0 0 0 rgba(77,191,124,.6); }
+    70% { box-shadow: 0 0 0 10px rgba(77,191,124,0); }
+    100% { box-shadow: 0 0 0 0 rgba(77,191,124,0); }
+  }
+
+  /* Stat strip — secondary KPIs under the hero */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-sm); padding: 12px 12px; text-align: left; }
+  .stat .num { font-family: var(--font-display); font-size: 22px; font-weight: 700;
+    letter-spacing: -.02em; }
+  .stat .lbl { color: var(--muted); font-size: 11px; margin-top: 2px;
+    text-transform: uppercase; letter-spacing: .6px; font-weight: 600; }
+  .stat.accent .num { color: var(--brand); }
+  .stat.good .num { color: var(--good); }
+
+  /* Legacy KPI (kept for any other screen that uses it) */
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-sm); padding: 14px; }
+  .kpi .num { font-family: var(--font-display); font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .kpi .lbl { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .kpi.accent .num { color: var(--brand); }
+  .kpi.good .num { color: var(--good); }
+
+  /* List rows */
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface-2);
+    display: grid; place-items: center; font-weight: 700; color: var(--brand-soft); flex: none; }
+  .row .meta { flex: 1; min-width: 0; }
+  .row .meta .t { font-weight: 600; }
+  .row .meta .s { color: var(--muted); font-size: 12px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .right { color: var(--muted); font-size: 12px; flex: none; }
+  .pill { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 999px;
+    background: var(--surface-2); color: var(--muted); }
+  .pill.good { background: rgba(43,168,100,.15); color: #6FD49A; }
+  .pill.warn { background: rgba(255,179,0,.15); color: var(--brand-soft); }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 14px 16px; border-radius: 14px; border: 0;
+    font-weight: 700; font-size: 15px; cursor: pointer; }
+  .btn.primary { background: var(--brand); color: #1A1D24; }
+  .btn.primary:active { transform: translateY(1px); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  .btn.danger { background: rgba(229,75,75,.15); color: #FF8A8A; }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .btn { flex: 1; }
+
+  /* Bottom tab bar */
+  .tabbar {
+    position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
+    background: rgba(20,17,14,.92); backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    padding: 8px 4px calc(env(safe-area-inset-bottom) + 8px);
+    z-index: 10;
+  }
+  .tab { background: none; border: 0; color: var(--muted); padding: 6px 4px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-size: 11px; cursor: pointer; }
+  .tab.active { color: var(--brand); }
+  .tab svg { width: 22px; height: 22px; }
+
+  /* QR card */
+  .qr-card { background: #FFF8E7; color: #1A1D24; border-radius: var(--radius);
+    padding: 18px; text-align: center; }
+  .qr-card .qr-wrap { background: #fff; border-radius: 14px; padding: 10px; display: inline-block; }
+  .qr-card img { display: block; width: 200px; height: 200px; }
+  .qr-card .name { font-weight: 800; font-size: 18px; margin-top: 12px; }
+  .qr-card .sub { color: #555; font-size: 12px; }
+  .qr-card .ref { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px; color: #555; margin-top: 6px; }
+
+  /* Forms */
+  label { display: block; font-size: 12px; color: var(--muted); margin: 10px 2px 6px; }
+  input, select, textarea {
+    width: 100%; padding: 12px 14px; border-radius: 12px;
+    background: var(--surface-2); color: var(--text); border: 1px solid var(--line);
+    font-size: 15px; font-family: inherit;
+  }
+  input:focus, select:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+  /* Modal */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: none; align-items: flex-end; justify-content: center; z-index: 20; }
+  .modal-backdrop.open { display: flex; }
+  .sheet { background: var(--surface); width: 100%; max-width: 480px;
+    border-top-left-radius: 24px; border-top-right-radius: 24px;
+    padding: 18px 18px calc(env(safe-area-inset-bottom) + 18px);
+    max-height: 88vh; overflow-y: auto; animation: slideup .25s ease; }
+  @keyframes slideup { from { transform: translateY(40px); opacity: .6; } to { transform: none; opacity: 1; } }
+  .sheet .handle { width: 40px; height: 4px; border-radius: 2px; background: var(--line);
+    margin: 4px auto 14px; }
+  .sheet h3 { margin: 0 0 4px; }
+
+  /* Toast */
+  .toast { position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%);
+    background: #2BA864; color: white; padding: 12px 16px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 30; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
+  /* Tiny dot indicator */
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); display: inline-block; }
+  .dot.off { background: var(--muted); }
+
+  /* Hidden helper */
+  .hidden { display: none !important; }
+
+  /* Subtle hint banner */
+  .demo-banner {
+    margin: 0 16px 8px; padding: 8px 12px; background: rgba(255,179,0,.1);
+    border: 1px solid rgba(255,179,0,.25); color: var(--brand-soft);
+    font-size: 11px; text-align: center; border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="topbar">
+    <div class="logo" aria-label="City Bucket List">
+      <svg viewBox="0 0 40 40" width="28" height="28" role="img" aria-hidden="true">
+        <!-- Bold C, opening to the right -->
+        <path
+          d="M30 12 A 11 11 0 1 0 30 28"
+          fill="none" stroke="#1A1207" stroke-width="5.2"
+          stroke-linecap="round" />
+        <!-- Tick living inside the C's negative space -->
+        <polyline points="14,21 18,25 25,16"
+          fill="none" stroke="#FFE38A" stroke-width="3"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">City Bucket List</div>
+      <div class="brand-sub">Owner preview</div>
+    </div>
+  </header>
+
+  <div class="demo-banner">This is a tap-through preview — no drivers or riders are notified.</div>
+
+  <!-- =================== TODAY =================== -->
+  <main class="screen" id="screen-today">
+    <h1 class="screen-title">Good evening, <em>Marcus</em></h1>
+
+    <div class="hero">
+      <div class="eyebrow"><span class="pulse-dot"></span>Live · Monday, May 11</div>
+      <div class="headline"><span class="big">3 drivers</span> on shift.<br><em>8 riders out.</em></div>
+      <div class="sub">Your fleet at a glance — who's driving, who's riding, and which pickups are happening right now. Tap any name for the full profile.</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat accent"><div class="num">8</div><div class="lbl">Rides today</div></div>
+      <div class="stat"><div class="num">18</div><div class="lbl">Riders in contacts</div></div>
+    </div>
+
+    <div class="section-label">Recent activity</div>
+    <div class="card flush">
+      <div class="row">
+        <div class="avatar">JR</div>
+        <div class="meta">
+          <div class="t">Jamal R. · airport pickup</div>
+          <div class="s">Driver Marcus on the way · 4 min ago</div>
+        </div>
+        <span class="pill good">live</span>
+      </div>
+      <div class="row">
+        <div class="avatar">LP</div>
+        <div class="meta">
+          <div class="t">Lena P. · booked for tomorrow 9:00 AM</div>
+          <div class="s">Saved to schedule · 22 min ago</div>
+        </div>
+        <span class="pill warn">scheduled</span>
+      </div>
+      <div class="row">
+        <div class="avatar">DS</div>
+        <div class="meta">
+          <div class="t">Devin S. · downtown to north</div>
+          <div class="s">Completed · $14 · 1 hr ago</div>
+        </div>
+        <span class="pill">done</span>
+      </div>
+      <div class="row">
+        <div class="avatar">TA</div>
+        <div class="meta">
+          <div class="t">Tomas A. · clocked in via QR</div>
+          <div class="s">Northside zone · 2 hr ago</div>
+        </div>
+        <span class="pill good">on shift</span>
+      </div>
+    </div>
+
+    <div class="section-label">Why this matters</div>
+    <div class="card" style="padding: 18px 18px 20px;">
+      <div style="font-family:var(--font-display); font-size:20px; font-weight:700; letter-spacing:-.01em; line-height:1.25; margin-bottom:8px;">
+        Every driver onboarded fast, <em style="color:var(--brand-soft); font-weight:500;">every rider confirmed by QR.</em>
+      </div>
+      <div style="color:var(--muted); font-size:14px; line-height:1.55;">
+        Add a new driver in under a minute and text them a QR card to clock in. Every rider gets a one-time pickup QR — the driver scans it on arrival, so there's no "are you my driver?" guesswork.
+      </div>
+    </div>
+
+    <button class="btn primary" onclick="go('drivers')">See your drivers →</button>
+  </main>
+
+  <!-- =================== DRIVERS =================== -->
+  <main class="screen hidden" id="screen-drivers">
+    <h1 class="screen-title">Your drivers</h1>
+
+    <div class="card" style="display:flex; align-items:center; gap:12px;">
+      <div style="flex:1;">
+        <div style="font-weight:700;">Onboard a new driver in 60 seconds</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:2px;">
+          Add their info, text them their QR card. They scan to clock in.
+        </div>
+      </div>
+    </div>
+    <button class="btn primary" onclick="openAddDriver()" style="margin-bottom:14px;">+ Add driver</button>
+
+    <div class="section-label">On shift</div>
+    <div class="card flush" id="driverList"></div>
+  </main>
+
+  <!-- =================== RIDERS =================== -->
+  <main class="screen hidden" id="screen-riders">
+    <h1 class="screen-title">Riders</h1>
+
+    <div class="card">
+      <div style="font-weight:700; margin-bottom:6px;">QR pickup verification</div>
+      <div style="color:var(--muted); font-size:14px; line-height:1.5;">
+        After booking, each rider gets a one-time QR by text. The driver scans on pickup — no name mix-ups, no awkward "are you my driver?" moments.
+      </div>
+    </div>
+
+    <div class="section-label">Sample rider</div>
+    <div class="qr-card">
+      <div class="qr-wrap"><img id="riderQr" alt="Rider QR" /></div>
+      <div class="name">Jamal Robinson</div>
+      <div class="sub">Downtown → LAX · 7:42 PM pickup</div>
+      <div class="ref" id="riderRef">CBL-2026-A47Q1</div>
+    </div>
+
+    <div class="section-label">Rider contacts</div>
+    <button class="btn primary" onclick="openAddRider()" style="margin-bottom:12px;">+ Add rider</button>
+    <div class="card flush" id="riderList"></div>
+
+    <div style="height:8px;"></div>
+    <button class="btn ghost" onclick="go('today')">← Back to dashboard</button>
+  </main>
+
+  <!-- Add rider modal -->
+  <div class="modal-backdrop" id="riderModal" onclick="if(event.target===this)closeAddRider()">
+    <div class="sheet">
+      <div class="handle"></div>
+      <h3>Add a rider contact</h3>
+      <div style="color:var(--muted); font-size:13px; margin-bottom:4px;">
+        Saved addresses make repeat bookings one tap — pick a rider, pick Home or Work, you're done.
+      </div>
+      <label>Full name</label>
+      <input id="rName" placeholder="e.g. Lena Park" />
+      <label>Mobile number</label>
+      <input id="rPhone" placeholder="(555) 123-4567" />
+      <label>Home address</label>
+      <input id="rHome" placeholder="123 Oak St, downtown" />
+      <label>Work / second address (optional)</label>
+      <input id="rWork" placeholder="2400 Wilshire Blvd" />
+      <div style="height:14px;"></div>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="closeAddRider()">Cancel</button>
+        <button class="btn primary" onclick="saveRider()">Save contact</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabbar -->
+  <nav class="tabbar">
+    <button class="tab active" data-screen="today" onclick="go('today')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 7h-3v9h-4v-6h-4v6H6v-9H3z"/></svg>
+      Today
+    </button>
+    <button class="tab" data-screen="drivers" onclick="go('drivers')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+      Drivers
+    </button>
+    <button class="tab" data-screen="riders" onclick="go('riders')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11h2v2H3v-2zm0-4h2v2H3V7zm0 8h2v2H3v-2zm4-8h2v2H7V7zm0 4h2v2H7v-2zm0 4h2v2H7v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-8h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
+      Riders
+    </button>
+  </nav>
+
+  <!-- Add driver modal -->
+  <div class="modal-backdrop" id="driverModal" onclick="if(event.target===this)closeAddDriver()">
+    <div class="sheet">
+      <div class="handle"></div>
+      <h3>Onboard a driver</h3>
+      <div style="color:var(--muted); font-size:13px; margin-bottom:4px;">
+        Their QR card is generated instantly — text it to them so they can clock in.
+      </div>
+      <label>Driver name</label>
+      <input id="dName" placeholder="e.g. Marcus Johnson" />
+      <label>Mobile number</label>
+      <input id="dPhone" placeholder="(555) 123-4567" />
+      <label>Vehicle</label>
+      <input id="dVehicle" placeholder="2022 Toyota Sienna — silver" />
+      <label>Primary zones</label>
+      <select id="dZone">
+        <option>Downtown</option>
+        <option>Airport</option>
+        <option>North</option>
+        <option>South</option>
+        <option>East</option>
+        <option>West</option>
+      </select>
+      <div style="height:14px;"></div>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="closeAddDriver()">Cancel</button>
+        <button class="btn primary" onclick="saveDriver()">Generate QR card</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New driver QR sheet -->
+  <div class="modal-backdrop" id="qrModal" onclick="if(event.target===this)closeQr()">
+    <div class="sheet">
+      <div class="handle"></div>
+      <h3>Driver QR card ready</h3>
+      <div style="color:var(--muted); font-size:13px; margin-bottom:12px;">
+        Text this to your driver — they'll scan it to clock in.
+      </div>
+      <div class="qr-card">
+        <div class="qr-wrap"><img id="newDriverQr" alt="Driver QR" /></div>
+        <div class="name" id="newDriverName"></div>
+        <div class="sub" id="newDriverSub"></div>
+        <div class="ref" id="newDriverRef"></div>
+      </div>
+      <div style="height:14px;"></div>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="closeQr()">Close</button>
+        <button class="btn primary" onclick="fakeText()">Text it to them</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+  // ---------- Navigation ----------
+  const screens = ['today', 'drivers', 'riders'];
+  function go(name) {
+    screens.forEach(s => {
+      const el = document.getElementById('screen-' + s);
+      if (el) el.classList.toggle('hidden', s !== name);
+    });
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.screen === name);
+    });
+    if (name === 'drivers') renderDrivers();
+    if (name === 'riders') renderRider();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  // ---------- Toast ----------
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  // ---------- QR helper (uses public QR endpoint, works on any phone with data) ----------
+  function qrUrl(data, size = 220) {
+    return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size +
+      '&margin=8&data=' + encodeURIComponent(data);
+  }
+
+  // ---------- Drivers ----------
+  const drivers = [
+    { name: 'Marcus Johnson', phone: '(555) 901-4422', vehicle: '2022 Toyota Sienna', zone: 'Downtown', online: true, rides: 142 },
+    { name: 'Priya Sharma', phone: '(555) 770-1180', vehicle: '2021 Honda Odyssey', zone: 'Airport', online: true, rides: 98 },
+    { name: 'Tomas Alvarez', phone: '(555) 312-8800', vehicle: '2023 Kia Carnival', zone: 'North', online: false, rides: 64 }
+  ];
+
+  function renderDrivers() {
+    const list = document.getElementById('driverList');
+    list.innerHTML = drivers.map(d => `
+      <div class="row">
+        <div class="avatar">${initials(d.name)}</div>
+        <div class="meta">
+          <div class="t">${d.name} <span class="dot ${d.online ? '' : 'off'}"></span></div>
+          <div class="s">${d.vehicle} · ${d.zone} · ${d.rides} rides</div>
+        </div>
+        <span class="pill ${d.online ? 'good' : ''}">${d.online ? 'online' : 'off'}</span>
+      </div>
+    `).join('');
+  }
+  function initials(name) {
+    return name.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+  }
+
+  function openAddDriver() { document.getElementById('driverModal').classList.add('open'); }
+  function closeAddDriver() { document.getElementById('driverModal').classList.remove('open'); }
+
+  function saveDriver() {
+    const name = document.getElementById('dName').value.trim() || 'New Driver';
+    const phone = document.getElementById('dPhone').value.trim() || '(555) 000-0000';
+    const vehicle = document.getElementById('dVehicle').value.trim() || 'Vehicle TBD';
+    const zone = document.getElementById('dZone').value;
+    const ref = 'DRV-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+    drivers.unshift({ name, phone, vehicle, zone, online: false, rides: 0 });
+
+    // Fill QR sheet
+    const payload = JSON.stringify({ t: 'driver', ref, name, phone, zone });
+    document.getElementById('newDriverQr').src = qrUrl(payload);
+    document.getElementById('newDriverName').textContent = name;
+    document.getElementById('newDriverSub').textContent = vehicle + ' · ' + zone;
+    document.getElementById('newDriverRef').textContent = ref;
+
+    closeAddDriver();
+    document.getElementById('qrModal').classList.add('open');
+
+    // Reset form
+    document.getElementById('dName').value = '';
+    document.getElementById('dPhone').value = '';
+    document.getElementById('dVehicle').value = '';
+  }
+  function closeQr() {
+    document.getElementById('qrModal').classList.remove('open');
+    renderDrivers();
+    toast('Driver added · QR card ready');
+  }
+  function fakeText() {
+    closeQr();
+    toast('QR card sent by text ✓');
+  }
+
+  // ---------- Riders ----------
+  const riders = [
+    { name: 'Lena Park',     phone: '(555) 220-4413', home: '812 Cedar Ave, downtown',  work: '500 Wilshire Blvd, suite 1200', rides: 3,  tag: 'verified' },
+    { name: 'Devin Soto',    phone: '(555) 884-1907', home: '4410 Sunset Pl, north',    work: '',                              rides: 1,  tag: 'new' },
+    { name: 'Asha Khan',     phone: '(555) 612-7728', home: '27 Harbor Way, west',      work: 'County General Hospital',       rides: 12, tag: 'verified' },
+    { name: 'Jamal Robinson',phone: '(555) 014-2207', home: '555 Main St, downtown',    work: 'LAX Terminal 4',                rides: 7,  tag: 'verified' }
+  ];
+
+  function renderRider() {
+    document.getElementById('riderQr').src = qrUrl(JSON.stringify({
+      t: 'rider', ref: 'CBL-2026-A47Q1', name: 'Jamal Robinson', pickup: '555 Main St', dropoff: 'LAX T4'
+    }));
+    renderRiderList();
+  }
+
+  function renderRiderList() {
+    const list = document.getElementById('riderList');
+    list.innerHTML = riders.map(r => `
+      <div class="row" style="align-items:flex-start; padding:14px;">
+        <div class="avatar">${initials(r.name)}</div>
+        <div class="meta">
+          <div class="t">${r.name}</div>
+          <div class="s" style="white-space:normal; color:var(--text); font-size:13px; margin-top:2px;">${r.phone}</div>
+          <div class="s" style="white-space:normal; margin-top:4px;">
+            <span style="color:var(--brand-soft);">Home</span> · ${r.home || '—'}
+          </div>
+          ${r.work ? `<div class="s" style="white-space:normal; margin-top:2px;">
+            <span style="color:var(--brand-soft);">Work</span> · ${r.work}
+          </div>` : ''}
+          <div class="s" style="margin-top:6px;">${r.rides} ride${r.rides === 1 ? '' : 's'}</div>
+        </div>
+        <span class="pill ${r.tag === 'verified' ? 'good' : ''}">${r.tag}</span>
+      </div>
+    `).join('');
+  }
+
+  function openAddRider() { document.getElementById('riderModal').classList.add('open'); }
+  function closeAddRider() { document.getElementById('riderModal').classList.remove('open'); }
+  function saveRider() {
+    const name = document.getElementById('rName').value.trim();
+    const phone = document.getElementById('rPhone').value.trim();
+    const home = document.getElementById('rHome').value.trim();
+    const work = document.getElementById('rWork').value.trim();
+    if (!name) { toast('Name is required'); return; }
+    riders.unshift({ name, phone: phone || '—', home, work, rides: 0, tag: 'new' });
+    ['rName','rPhone','rHome','rWork'].forEach(id => document.getElementById(id).value = '');
+    closeAddRider();
+    renderRiderList();
+    toast('Rider contact saved ✓');
+  }
+
+  // ---------- Boot ----------
+  go('today');
+</script>
+</body>
+</html>
